@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        githubPush()   // webhook triggers Jenkins automatically on every push
+        githubPush()   // webhook triggers Jenkins automatically
     }
     stages {
         stage('Checkout') {
