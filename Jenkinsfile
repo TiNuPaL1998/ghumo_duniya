@@ -1,7 +1,7 @@
 pipeline {
     agent any
     triggers {
-        githubPush()   // webhook triggers Jenkins on every push
+        githubPush()   // webhook triggers Jenkins automatically on every push
     }
     stages {
         stage('Checkout') {
@@ -16,17 +16,16 @@ pipeline {
         }
         stage('Push to Registry') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'DOCKER_PASS')]) {
-                    sh 'echo $DOCKER_PASS | docker login -u yourdockeruser --password-stdin'
-                    sh 'docker tag ghumo_duniya:latest yourdockeruser/ghumo_duniya:latest'
-                    sh 'docker push yourdockeruser/ghumo_duniya:latest'
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
+                    sh 'docker tag ghumo_duniya:latest $DOCKER_USER/ghumo_duniya:latest'
+                    sh 'docker push $DOCKER_USER/ghumo_duniya:latest'
                 }
             }
         }
         stage('Deploy to Kubernetes') {
             steps {
-                sh 'kubectl apply -f k8s/deployment.yaml'
-                sh 'kubectl apply -f k8s/service.yaml'
+                sh 'kubectl apply -f k8s-deployment.yaml'
             }
         }
     }
