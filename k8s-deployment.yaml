@@ -15,5 +15,6 @@ spec:
       containers:
       - name: ghumo-duniya
         image: unit1998/ghumo_duniya:latest
+        imagePullPolicy: Always # <--- ADD THIS LINE
         ports:
         - containerPort: 80

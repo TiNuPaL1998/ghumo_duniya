@@ -1,9 +1,14 @@
 pipeline {
     agent any
     triggers {
-        githubPush()   // webhook triggers Jenkins automatically
+        githubPush()
     }
     stages {
+        stage('Cleanup') {
+            steps {
+                cleanWs() // Clear previous build artifacts
+            }
+        }
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/TiNuPaL1998/ghumo_duniya.git'
@@ -11,6 +16,7 @@ pipeline {
         }
         stage('Docker Build') {
             steps {
+                // The Dockerfile now handles the 'npm install' and 'npm build'
                 sh 'docker build -t ghumo_duniya:latest .'
             }
         }
@@ -27,8 +33,9 @@ pipeline {
     steps {
         sh 'kubectl apply -f k8s-deployment.yaml'
         sh 'kubectl apply -f k8s-service.yaml'
+        // This forces the pods to restart with the new UI code
+        sh 'kubectl rollout restart deployment/ghumo-duniya'
     }
 }
-
     }
 }
