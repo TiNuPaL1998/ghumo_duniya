@@ -1,17 +1,23 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven'
+    }
+
     stages {
 
         stage('Checkout') {
             steps {
-                git 'https://github.com/TiNuPaL1998/ghumo_duniya.git'
+                git branch: 'main', url: 'https://github.com/TiNuPaL1998/ghumo_duniya.git'
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package'
+                dir('demo') {   // ✅ IMPORTANT FIX
+                    sh 'mvn -Dmaven.test.skip=true clean package'
+                }
             }
         }
 
@@ -21,13 +27,9 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy via Ansible') {
             steps {
-                sh '''
-                docker stop java-app || true
-                docker rm java-app || true
-                docker run -d -p 8080:8080 --name java-app java-app
-                '''
+                sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i hosts deploy.yml'
             }
         }
     }
