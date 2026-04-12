@@ -1,12 +1,9 @@
-FROM node:18
+FROM eclipse-temurin:17-jdk
 
 WORKDIR /app
 
-COPY . .
+COPY demo/target/*.jar app.jar
 
-RUN npm install
-RUN npm run build
+EXPOSE 8080
 
-EXPOSE 3000
-
-CMD ["npm", "start"]
+ENTRYPOINT ["java","-jar","app.jar"]
